@@ -8,5 +8,6 @@ internal class TempMapInfo
     public ArgumentSyntax? PostProcess { get; set; }
     public ArgumentSyntax? Activator { get; set; }
     public string Error { get; set; } = "";
+    public bool IsMappable { get; set; }
     public bool IsViewModelBase { get; set; }
 }

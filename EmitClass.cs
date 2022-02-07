@@ -37,9 +37,63 @@ internal class EmitClass
         }
         return output;
     }
+    //internal class SecondClassMapContext : CommonBasicLibraries.AdvancedGeneralFunctionsAndProcesses.MapHelpers.ICustomMapContext<SecondClass>
+    //{
+    //    SecondClass ICustomMapContext<SecondClass>.AutoMap(IMappable payLoad)
+    //    {
+    //        if (payLoad is not FirstClass item)
+    //        {
+    //            throw new Exception("Invalid cast for FirstClass");
+    //        }
+    //        return item.MapTo();
+    //    }
+    //}
+    private void WriteGlobalInterface(ICodeBlock w, MapModel item)
+    {
+        w.WriteLine(w =>
+        {
+            w.Write("private class ")
+            .Write(item.Target!.ClassName)
+            .Write("MapContext : CommonBasicLibraries.AdvancedGeneralFunctionsAndProcesses.MapHelpers.ICustomMapContext<")
+            .Write(item.Target!.GetGlobalName)
+            .Write(">");
+        })
+        .WriteCodeBlock(w =>
+        {
+            w.WriteLine(w =>
+            {
+                w.Write(item.Target!.GetGlobalName)
+                .Write(" ICustomMapContext<")
+                .Write(item.Target!.GetGlobalName)
+                .Write(">.AutoMap(IMappable payLoad)");
+            })
+            .WriteCodeBlock(w =>
+            {
+                w.WriteLine(w =>
+                {
+                    w.Write("if (payLoad is not ")
+                    .Write(item.Source!.GetGlobalName)
+                    .Write(" item)");
+                })
+                .WriteCodeBlock(w =>
+                {
+                    w.WriteLine(w =>
+                    {
+                        w.CustomExceptionLine(w =>
+                        {
+                            w.Write("Invalid cast for ")
+                            .Write(item.Source!.ClassName);
+                        });
+                    });
+                })
+                .WriteLine("return item.MapTo();");
+            });
+        });
+    }
     private void AddMapGlobal()
     {
-        if (_complete.Maps.Count == 0)
+        var filters = _complete.Maps.Where(x => x.IsMappable).ToBasicList();
+        if (filters.Count == 0)
         {
             return;
         }
@@ -56,28 +110,22 @@ internal class EmitClass
              .WriteLine("public static class Registrations")
              .WriteCodeBlock(w =>
              {
+                 foreach (var item in filters)
+                 {
+                     WriteGlobalInterface(w, item);
+                 }
                  w.WriteLine("public static void RegisterMappings()")
                  .WriteCodeBlock(w =>
                  {
-                     foreach (var item in _complete.Maps)
+                     foreach (var item in filters)
                      {
                          w.WriteLine(w =>
                          {
-                             w.Write("CommonBasicLibraries.BasicDataSettingsAndProcesses.MapHelpers<")
+                             w.Write("CommonBasicLibraries.AdvancedGeneralFunctionsAndProcesses.MapHelpers.CustomMapperHelpers<")
                              .Write(item.Target!.GetGlobalName)
-                             .Write(">.AddMap(typeof(")
-                             .Write(item.Source!.GetGlobalName)
-                             .Write("), item =>");
-                         })
-                         .WriteLambaBlock(w =>
-                         {
-                             w.WriteLine(w =>
-                             {
-                                 w.Write("var fins = item as ")
-                                 .Write(item.Source!.GetGlobalName)
-                                 .Write(";");
-                             })
-                             .WriteLine("return fins!.MapTo();");
+                             .Write(">.MasterContext = new ")
+                             .Write(item.Target!.ClassName)
+                             .Write("MapContext();");
                          });
                      }
                  });

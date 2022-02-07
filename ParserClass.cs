@@ -51,6 +51,7 @@ internal class ParserClass
             fins.Activator = item.Activator;
             var pList = item.Source!.GetAllPublicProperties();
             var seconds = item.Target.GetAllPublicProperties();
+            fins.IsMappable = item.IsMappable;
             fins.IsViewModelBase = item.IsViewModelBase;
             foreach (var p in pList)
             {
@@ -119,6 +120,7 @@ internal class ParserClass
                     info.PreventDeepCalls = thirds;
                     info.Source = makeType;
                     info.Target = (INamedTypeSymbol)firsts.Single().MethodSymbol.TypeArguments[0];
+                    info.IsMappable = info.Source.Implements("IMappable");
                     info.IsViewModelBase = info.Source.Implements("IViewModelBase");
                     _tempMaps.Add(info);
                 }
@@ -192,6 +194,7 @@ internal class ParserClass
             info.Explicit = declarationExplicit;
             info.Symbol = symbol;
             info.IsViewModelBase = symbol.Implements("IViewModelBase");
+
             _tempClones.Add(info);
         }
         else
