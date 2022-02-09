@@ -20,18 +20,51 @@ internal class ParserClass
         foreach (var item in _tempClones)
         {
             CloneModel result = new();
-            result.ClassName = item.Symbol!.Name;
+            result.SymbolUsed = item.Symbol;
+            bool collection = false;
+            collection = item.Symbol!.IsCollection();
+            result.Collection = collection;
+            if (collection)
+            {
+                var others = item.Symbol!.GetSingleGenericTypeUsed();
+                result.FileName = $"{item.Symbol!.Name}{others!.Name}";
+                result.GlobalName = $"global::{item.Symbol!.ContainingNamespace!.ToDisplayString()}.{item.Symbol.Name}<global::{others.ContainingNamespace.ToDisplayString()}.{others.Name}>";
+            }
+            else
+            {
+                result.FileName = item.Symbol!.Name;
+                result.GlobalName = $"global::{item.Symbol.ContainingNamespace.ToDisplayString()}.{item.Symbol.Name}";
+            }
+            //result.ClassName = item.Symbol!.Name;
             result.Explicit = item.Explicit;
             result.IsViewModelBase = item.IsViewModelBase;
-            result.NamespaceName = item.Symbol.ContainingNamespace.ToDisplayString();
-            var pList = item.Symbol!.GetAllPublicProperties();
-            foreach (var p in pList)
+            //result.NamespaceName = item.Symbol.ContainingNamespace.ToDisplayString();
+            if (collection == false)
             {
-                var fins = p.GetProperty(item, _tempClones);
-                if (fins is not null)
+                var pList = item.Symbol!.GetAllPublicProperties();
+                foreach (var p in pList)
                 {
-                    result.Properties.Add(fins);
+                    var fins = p.GetProperty(item, _tempClones);
+                    if (fins is not null)
+                    {
+                        result.Properties.Add(fins);
+                    }
                 }
+            }
+            else
+            {
+                //for this version, you need to mark all underyling as cloneable.
+                //has to do something here now.
+                //try this way.
+                //var pList = item.Symbol.GetSingleGenericTypeUsed()!.GetAllPublicProperties();
+                //foreach (var p in pList)
+                //{
+                //    var fins = p.GetProperty(item, _tempClones);
+                //    if (fins is not null)
+                //    {
+                //        result.Properties.Add(fins);
+                //    }
+                //}
             }
             output.Clones.Add(result);
         }

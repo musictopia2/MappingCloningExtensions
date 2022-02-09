@@ -315,11 +315,12 @@ internal class EmitClass
                 });
             }
         });
-        _context.AddSource($"{result.ClassName}.CloneExtensions.g", builder.ToString());
+        _context.AddSource($"{result.FileName}.CloneExtensions.g", builder.ToString());
     }
     private void ProcessCloneRegular(ICodeBlock w, CloneModel result)
     {
-        CreateBasicOutput(w, result, result.GetGlobalName, EnumMethodCategory.Regular);
+
+        CreateBasicOutput(w, result, result.GlobalName, EnumMethodCategory.Regular);
         PopulateLists(w, result, EnumMethodCategory.Regular);
         FinalWrite(w);
     }
@@ -332,23 +333,45 @@ internal class EmitClass
             })
             .WriteLine("referenceChain ??= new ();")
             .WriteLine("referenceChain.Push(source);");
-        CreateBasicOutput(w, result, result.GetGlobalName, EnumMethodCategory.Safe);
+        CreateBasicOutput(w, result, result.GlobalName, EnumMethodCategory.Safe);
         PopulateLists(w, result, EnumMethodCategory.Safe);
         w.WriteLine("referenceChain.Pop();");
         FinalWrite(w);
     }
     private void PopulateLists(ICodeBlock w, IProperties result, EnumMethodCategory method)
     {
-        foreach (var p in result.Properties)
+        if (result.Collection == false)
         {
-            if (p.ListCategory == EnumListCategory.Single)
+            foreach (var p in result.Properties)
             {
-                PrintSingleListInfo(w, p, method);
+                if (p.ListCategory == EnumListCategory.Single)
+                {
+                    PrintSingleListInfo(w, p, method);
+                }
+                else if (p.ListCategory == EnumListCategory.Double)
+                {
+                    PrintDoubleListInfo(w, p, method);
+                }
             }
-            else if (p.ListCategory == EnumListCategory.Double)
+        }
+        else
+        {
+            //var list = 
+            //has to figure out what else is needed.
+            //w.WriteLine("//needs to figure out list");
+
+            w.WriteLine("foreach (var item in source.AsSpan())")
+            .WriteCodeBlock(w =>
             {
-                PrintDoubleListInfo(w, p, method);
-            }
+                if (method == EnumMethodCategory.Regular)
+                {
+                    w.WriteLine("output.Add(item.Clone());"); //the compile errors will tell me i did not mark something as clonable that needs to be.
+                }
+                else
+                {
+                    w.WriteLine("output.Add(item.CloneSafe(referenceChain));");
+                }
+            });
         }
     }
     private void CreateBasicOutput(ICodeBlock w, IProperties result, string globalName, EnumMethodCategory method)
@@ -386,10 +409,18 @@ internal class EmitClass
         {
             w.Write(globalName)
             .Write(" output = new()");
-        }).WriteCodeBlock(w =>
+            if (result.Collection)
+            {
+                w.Write(";");
+            }
+        });
+        if (result.Collection == false)
         {
-            ConstructorProperties(w);
-        }, endSemi: true);
+            w.WriteCodeBlock(w =>
+            {
+                ConstructorProperties(w);
+            }, endSemi: true);
+        }
     }
     private void PrintSingleListInfo(ICodeBlock w, PropertyModel p, EnumMethodCategory method)
     {

@@ -44,9 +44,9 @@ internal static class WriterExtensions
             .WriteLine(w =>
             {
                 w.Write("public static ")
-                .Write(result.GetGlobalName)
+                .Write(result.GlobalName)
                 .Write(" Clone(this ")
-                .Write(result.GetGlobalName)
+                .Write(result.GlobalName)
                 .Write(" source)");
             }).WriteCodeBlock(w =>
             {
@@ -85,9 +85,9 @@ internal static class WriterExtensions
            .WriteLine(w =>
            {
                w.Write("public static ")
-               .Write(result.GetGlobalName)
+               .Write(result.GlobalName)
                .Write(" CloneSafe(this ")
-               .Write(result.GetGlobalName)
+               .Write(result.GlobalName)
                .Write(" source, global::System.Collections.Generic.Stack<object>? referenceChain = null)");
            }).WriteCodeBlock(w =>
            {

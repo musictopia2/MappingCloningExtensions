@@ -25,6 +25,6 @@ internal interface ICustomConfig
 }
 internal abstract class MainContext
 {
-    internal const string ConfigureName = nameof(Configure);
+    public const string ConfigureName = nameof(Configure);
     protected abstract void Configure(ICustomConfig config);
 }

@@ -9,4 +9,5 @@ internal class MapModel : IProperties
     public string Error { get; set; } = "";
     public bool IsMappable { get; set; } //if mappable, then needs to add to the globals.  but if not mappable, then don't add to global.
     public bool IsViewModelBase { get; set; }
+    public bool Collection { get; set; }
 }

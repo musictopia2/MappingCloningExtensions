@@ -1,9 +1,18 @@
-﻿namespace MappingCloningExtensions;
+﻿using System.Diagnostics;
+
+namespace MappingCloningExtensions;
 [Generator]
 public class MySourceGenerator : IIncrementalGenerator
 {
+
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+//#if DEBUG
+//        if (Debugger.IsAttached == false)
+//        {
+//            Debugger.Launch();
+//        }
+//#endif
         context.RegisterPostInitializationOutput(c =>
         {
             c.CreateCustomSource().AddAttributesToSourceOnly();
