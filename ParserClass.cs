@@ -44,6 +44,14 @@ internal class ParserClass
                 var pList = item.Symbol!.GetAllPublicProperties();
                 foreach (var p in pList)
                 {
+                    if (p.IsReadOnly)
+                    {
+                        continue;
+                    }
+                    if (p.Type.Name == "Action")
+                    {
+                        continue; //does not need to clone or copy action stuff.
+                    }
                     var fins = p.GetProperty(item, _tempClones);
                     if (fins is not null)
                     {
