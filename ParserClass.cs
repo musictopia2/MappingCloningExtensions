@@ -24,21 +24,29 @@ internal class ParserClass
             bool collection = false;
             collection = item.Symbol!.IsCollection();
             result.Collection = collection;
+            ITypeSymbol? others;
             if (collection)
             {
-                var others = item.Symbol!.GetSingleGenericTypeUsed();
+                others = item.Symbol!.GetSingleGenericTypeUsed();
                 result.FileName = $"{item.Symbol!.Name}{others!.Name}";
                 result.GlobalName = $"global::{item.Symbol!.ContainingNamespace!.ToDisplayString()}.{item.Symbol.Name}<global::{others.ContainingNamespace.ToDisplayString()}.{others.Name}>";
             }
             else
             {
-                result.FileName = item.Symbol!.Name;
-                result.GlobalName = $"global::{item.Symbol.ContainingNamespace.ToDisplayString()}.{item.Symbol.Name}";
+                others = item.Symbol!.GetSingleGenericTypeUsed();
+                if (others is null)
+                {
+                    result.FileName = item.Symbol!.Name;
+                    result.GlobalName = $"global::{item.Symbol.ContainingNamespace.ToDisplayString()}.{item.Symbol.Name}";
+                }
+                else
+                {
+                    result.FileName = $"{item.Symbol!.Name}{others!.Name}";
+                    result.GlobalName = $"global::{item.Symbol!.ContainingNamespace!.ToDisplayString()}.{item.Symbol.Name}<global::{others.ContainingNamespace.ToDisplayString()}.{others.Name}>";
+                }
             }
-            //result.ClassName = item.Symbol!.Name;
             result.Explicit = item.Explicit;
             result.IsViewModelBase = item.IsViewModelBase;
-            //result.NamespaceName = item.Symbol.ContainingNamespace.ToDisplayString();
             if (collection == false)
             {
                 var pList = item.Symbol!.GetAllPublicProperties();
@@ -47,6 +55,10 @@ internal class ParserClass
                     if (p.IsReadOnly)
                     {
                         continue;
+                    }
+                    if (p.SetMethod?.DeclaredAccessibility != Accessibility.Public)
+                    {
+                        continue; //if you can't set it, can't do.
                     }
                     if (p.Type.Name == "Action")
                     {
