@@ -43,6 +43,11 @@ internal static class SymbolExtensions
             output.Cloneable = false;
             return output;
         }
+        bool forceClone = false;
+        if (propertySymbol.HasAttribute(aa.ForceClone.ForceCloneAttribute))
+        {
+            forceClone = true;
+        }
         bool preventDeep = false;
         if (main.PreventDeepCalls is not null && ParseUtils.PropertyHasExpectedValueAlone(main.PreventDeepCalls, propertySymbol, main.Source))
         {
@@ -56,7 +61,7 @@ internal static class SymbolExtensions
             {
                 return output.PopulateInvalidCastError(propertySymbol, main);
             }
-            output.Cloneable = other1.IsCloneable(main.Source, list, preventDeep);
+            output.Cloneable = other1.IsCloneable(main.Source, list, preventDeep, forceClone);
         }
         else if (output.ListCategory == EnumListCategory.Double)
         {
@@ -71,14 +76,14 @@ internal static class SymbolExtensions
             }
             if (main.IsViewModelBase == false)
             {
-                output.Cloneable = other2.IsCloneable(main.Source, list, preventDeep);
+                output.Cloneable = other2.IsCloneable(main.Source, list, preventDeep, forceClone);
             }
 
             output.CollectionNameSpace = $"global::{other1!.ContainingSymbol.ToDisplayString()}.{other1.Name}<global::{other2!.ContainingSymbol.ToDisplayString()}.{other2.Name}>";
         }
         else
         {
-            output.Cloneable = propertySymbol.Type.IsCloneable(main.Source, list, preventDeep);
+            output.Cloneable = propertySymbol.Type.IsCloneable(main.Source, list, preventDeep, forceClone);
         }
         return output;
     }
@@ -111,6 +116,11 @@ internal static class SymbolExtensions
         if (propertySymbol.HasAttribute(aa.IgnoreClone.IgnoreCloneAttribute))
         {
             return null;
+        }
+        bool forceClone = false;
+        if (propertySymbol.HasAttribute(aa.ForceClone.ForceCloneAttribute))
+        {
+            forceClone = true;
         }
         bool preventDeep = false;
         if (main.Clone is not null)
@@ -164,7 +174,7 @@ internal static class SymbolExtensions
             output.CollectionNameSpace = $"global::{other1!.ContainingSymbol.ToDisplayString()}.{other1.Name}<global::{other2!.ContainingSymbol.ToDisplayString()}.{other2.Name}>";
             if (main.IsViewModelBase == false)
             {
-                output.Cloneable = other2!.IsCloneable(main.Symbol, list, preventDeep);
+                output.Cloneable = other2!.IsCloneable(main.Symbol, list, preventDeep, forceClone);
             }
             else
             {
@@ -174,11 +184,11 @@ internal static class SymbolExtensions
         else if (output.ListCategory == EnumListCategory.Single)
         {
             var other1 = propertySymbol.Type.GetSingleGenericTypeUsed();
-            output.Cloneable = other1!.IsCloneable(main.Symbol, list, preventDeep);
+            output.Cloneable = other1!.IsCloneable(main.Symbol, list, preventDeep, forceClone);
         }
         else
         {
-            output.Cloneable = propertySymbol.Type.IsCloneable(main.Symbol, list, preventDeep);
+            output.Cloneable = propertySymbol.Type.IsCloneable(main.Symbol, list, preventDeep, forceClone);
         }
 
         return output;
@@ -194,9 +204,8 @@ internal static class SymbolExtensions
         }
         return false;
     }
-    private static bool IsCloneable(this ITypeSymbol propertySymbol, INamedTypeSymbol classSymbol, BasicList<TempCloneInfo> list, bool preventDeep)
+    private static bool IsCloneable(this ITypeSymbol propertySymbol, INamedTypeSymbol classSymbol, BasicList<TempCloneInfo> list, bool preventDeep, bool forceClone)
     {
-
         if (propertySymbol.IsSimpleType())
         {
             return false;
@@ -217,6 +226,11 @@ internal static class SymbolExtensions
         {
             return false;
         }
+        if (forceClone)
+        {
+            return true;
+        }
+
         bool rets = propertySymbol.IsCloneable(list);
         if (rets == false)
         {
