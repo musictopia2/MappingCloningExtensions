@@ -44,14 +44,23 @@ public class MySourceGenerator : IIncrementalGenerator
     {
         var ourClass = context.GetClassNode();
         NodeInformation output;
-        if (ourClass.BaseList is not null && ourClass.ToString().Contains(nameof(MainContext)))
+        //if (ourClass.BaseList is not null && ourClass.ToString().Contains(nameof(MainContext)))
+        //{
+        //    output = new();
+        //    output.Node = ourClass;
+        //    output.Source = EnumSourceCategory.Fluent;
+        //    return output;
+        //}
+        var symbol = (INamedTypeSymbol) context.SemanticModel.GetDeclaredSymbol(context.Node)!;
+        if (symbol.InheritsFrom("MainContext") && symbol.Name != "MainContext") //you should not be calling MainContext.  MainContext would probably be something else in this case.
         {
             output = new();
             output.Node = ourClass;
             output.Source = EnumSourceCategory.Fluent;
             return output;
         }
-        var symbol = context.SemanticModel.GetDeclaredSymbol(context.Node);
+
+
         bool rets = symbol!.HasAttribute(aa.Cloneable.CloneableAttribute);
         if (rets == false)
         {

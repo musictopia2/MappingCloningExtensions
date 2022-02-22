@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
@@ -9,7 +9,7 @@
 		<Description>Description</Description>
 		<Authors>musictopia</Authors>
 		<PackageProjectUrl>https://github.com/musictopia2/MappingCloningExtensions</PackageProjectUrl>
-		<Version>1.0.5</Version>
+		<Version>1.0.6</Version>
 	</PropertyGroup>
 	<PropertyGroup>
 		<IncludeBuildOutput>false</IncludeBuildOutput>
@@ -21,7 +21,7 @@
 
 		<PackageReference Include="AttributesSourceGeneratorHelper" Version="3.0.1" PrivateAssets="all" />
 
-		<PackageReference Include="CommonSourceGeneratorsHelpers" Version="2.0.34" PrivateAssets="all" />
+		<PackageReference Include="CommonSourceGeneratorsHelpers" Version="2.0.45" PrivateAssets="all" />
 		<PackageReference Include="GenerateHelperLibraries" Version="2.0.4" PrivateAssets="all" />
 
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" PrivateAssets="all" />
