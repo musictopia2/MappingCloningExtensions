@@ -134,7 +134,7 @@ internal class ParserClass
         foreach (var member in members)
         {
             var symbol = context.SemanticModel.GetDeclaredSymbol(member) as IMethodSymbol;
-            if (symbol is not null && symbol.Name == MainContext.ConfigureName)
+            if (symbol is not null && symbol.Name == MappingCloningContext.ConfigureName)
             {
                 ParseContext(context, member, symbol);
             }

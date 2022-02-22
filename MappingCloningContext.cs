@@ -23,7 +23,7 @@ internal interface ICustomConfig
 {
     ICustomConfig Make<T>(Action<IMakeConfig<T>> config);
 }
-internal abstract class MainContext
+internal abstract class MappingCloningContext
 {
     public const string ConfigureName = nameof(Configure);
     protected abstract void Configure(ICustomConfig config);

@@ -33,7 +33,7 @@ public class MySourceGenerator : IIncrementalGenerator
     {
         bool rets = syntax is ClassDeclarationSyntax ctx &&
             ctx.BaseList is not null &&
-            ctx.ToString().Contains(nameof(MainContext));
+            ctx.ToString().Contains(nameof(MappingCloningContext));
         if (rets)
         {
             return true;
@@ -52,7 +52,7 @@ public class MySourceGenerator : IIncrementalGenerator
         //    return output;
         //}
         var symbol = (INamedTypeSymbol) context.SemanticModel.GetDeclaredSymbol(context.Node)!;
-        if (symbol.InheritsFrom("MainContext") && symbol.Name != "MainContext") //you should not be calling MainContext.  MainContext would probably be something else in this case.
+        if (symbol.InheritsFrom("MappingCloningContext") && symbol.Name != "MappingCloningContext") //you should not be calling MainContext.  MainContext would probably be something else in this case.
         {
             output = new();
             output.Node = ourClass;
