@@ -5,9 +5,22 @@ internal static class WriterExtensions
     {
         w.WriteLine(w =>
         {
-            w.Write("public static ")
+            if (result.IsMappable)
+            {
+                w.Write("internal ");
+            }
+            else
+            {
+                w.Write("public ");
+            }
+            w.Write("static ")
             .PopulateFullNamespace(result.Target!)
-            .Write(" MapTo(this ")
+            .Write(" MapTo");
+            if (result.IsMappable)
+            {
+                w.Write(result.Target!.Name);   
+            }
+            w.Write("(this ")
             .PopulateFullNamespace(result.Source!)
             .Write(" source)");
         }).WriteCodeBlock(w =>
@@ -19,9 +32,22 @@ internal static class WriterExtensions
     {
         w.WriteLine(w =>
         {
-            w.Write("public static ")
+            if (result.IsMappable)
+            {
+                w.Write("internal ");
+            }
+            else
+            {
+                w.Write("public ");
+            }
+            w.Write("static ")
             .PopulateFullNamespace(result.Target!)
-            .Write(" MapToSafe(this ")
+            .Write(" MapToSafe");
+            if (result.IsMappable)
+            {
+                w.Write(result.Target!.Name); //will give other errors but is a good starting point.
+            }
+            w.Write("(this ")
             .PopulateFullNamespace(result.Source!)
             .Write(" source, global::System.Collections.Generic.Stack<object>? referenceChain = null)");
         }).WriteCodeBlock(w =>

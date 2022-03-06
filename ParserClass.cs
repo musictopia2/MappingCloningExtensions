@@ -166,18 +166,15 @@ internal class ParserClass
                 bool.TryParse(value, out bool rets);
                 var seconds = ParseUtils.FindCallsOfMethodInConfigLambda(context, firsts.Single(), nameof(IMapConfig<object, object>.Ignore), optional: true); //i think
                 var thirds = ParseUtils.FindCallsOfMethodInConfigLambda(context, firsts.Single(), nameof(IMapConfig<object, object>.PreventDeep), optional: true);
-                TempMapInfo? info = GetSavedMap(makeType);
-                if (info is null)
-                {
-                    info = new();
-                    info.IgnoreCalls = seconds;
-                    info.PreventDeepCalls = thirds;
-                    info.Source = makeType;
-                    info.Target = (INamedTypeSymbol)firsts.Single().MethodSymbol.TypeArguments[0];
-                    info.IsMappable = info.Source.Implements("IMappable");
-                    info.IsViewModelBase = info.Source.Implements("IViewModelBase");
-                    _tempMaps.Add(info);
-                }
+                //TempMapInfo? info = GetSavedMap(makeType);
+                TempMapInfo info = new(); //attempt to not even do saved maps.  because one can be used for many types.
+                info.IgnoreCalls = seconds;
+                info.PreventDeepCalls = thirds;
+                info.Source = makeType;
+                info.Target = (INamedTypeSymbol)firsts.Single().MethodSymbol.TypeArguments[0];
+                info.IsMappable = info.Source.Implements("IMappable");
+                info.IsViewModelBase = info.Source.Implements("IViewModelBase");
+                _tempMaps.Add(info);
                 var postProcessCalls = ParseUtils.FindCallsOfMethodInConfigLambda(context, firsts.Single(), nameof(IMapConfig<object, object>.PostProcess), optional: true);
                 if (postProcessCalls.Count == 1)
                 {

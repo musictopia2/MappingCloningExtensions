@@ -86,7 +86,13 @@ internal class EmitClass
                         });
                     });
                 })
-                .WriteLine("return item.MapTo();");
+                .WriteLine(w =>
+                {
+                    w.Write("return item. MapTo")
+                    .Write(item.Target!.Name)
+                    .Write("();");
+                });
+                //.WriteLine("return item.MapTo();");
             });
         });
     }
@@ -161,6 +167,7 @@ internal class EmitClass
         {
             ProcessSingleClone(item);
         }
+        //var list = _complete.Maps.GroupBy(x => x.Source, SymbolEqualityComparer.Default).ToBasicList();
         foreach (var item in _complete.Maps)
         {
             ProcessSingleMap(item);
@@ -184,7 +191,7 @@ internal class EmitClass
                 });
             }
         }, result);
-        _context.AddSource($"{result.Source!.Name}.MapExtensions.g", builder.ToString());
+        _context.AddSource($"{result.Source!.Name}{result.Target!.Name}.MapExtensions.g", builder.ToString()); //has to combine so can do both.
     }
     private void ProcessMapToSafe(ICodeBlock w, MapModel result)
     {
