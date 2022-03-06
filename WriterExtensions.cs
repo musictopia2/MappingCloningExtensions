@@ -6,9 +6,9 @@ internal static class WriterExtensions
         w.WriteLine(w =>
         {
             w.Write("public static ")
-            .Write(result.Target!.GetGlobalName)
+            .PopulateFullNamespace(result.Target!)
             .Write(" MapTo(this ")
-            .Write(result.Source!.GetGlobalName)
+            .PopulateFullNamespace(result.Source!)
             .Write(" source)");
         }).WriteCodeBlock(w =>
         {
@@ -20,9 +20,9 @@ internal static class WriterExtensions
         w.WriteLine(w =>
         {
             w.Write("public static ")
-            .Write(result.Target!.GetGlobalName)
+            .PopulateFullNamespace(result.Target!)
             .Write(" MapToSafe(this ")
-            .Write(result.Source!.GetGlobalName)
+            .PopulateFullNamespace(result.Source!)
             .Write(" source, global::System.Collections.Generic.Stack<object>? referenceChain = null)");
         }).WriteCodeBlock(w =>
         {

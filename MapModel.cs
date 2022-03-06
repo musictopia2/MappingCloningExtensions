@@ -1,8 +1,10 @@
 ﻿namespace MappingCloningExtensions;
 internal class MapModel : IProperties
 {
-    public ClassModel? Source { get; set; }
-    public ClassModel? Target { get; set; }
+    public INamedTypeSymbol? Source { get; set; }
+    public INamedTypeSymbol? Target { get; set; }
+    //public ClassModel? Source { get; set; }
+    //public ClassModel? Target { get; set; }
     public BasicList<PropertyModel> Properties { get; set; } = new();
     public ArgumentSyntax? PostProcess { get; set; }
     public ArgumentSyntax? Activator { get; set; }

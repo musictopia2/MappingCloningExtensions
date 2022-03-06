@@ -53,26 +53,26 @@ internal class EmitClass
         w.WriteLine(w =>
         {
             w.Write("private class ")
-            .Write(item.Target!.ClassName)
+            .Write(item.Target!.Name) //try this way.
             .Write("MapContext : CommonBasicLibraries.AdvancedGeneralFunctionsAndProcesses.MapHelpers.ICustomMapContext<")
-            .Write(item.Target!.GetGlobalName)
+            .PopulateFullNamespace(item.Target)
             .Write(">");
         })
         .WriteCodeBlock(w =>
         {
             w.WriteLine(w =>
             {
-                w.Write(item.Target!.GetGlobalName)
-                .Write(" ICustomMapContext<")
-                .Write(item.Target!.GetGlobalName)
-                .Write(">.AutoMap(IMappable payLoad)");
+                w.PopulateFullNamespace(item.Target!)
+                .Write(" CommonBasicLibraries.AdvancedGeneralFunctionsAndProcesses.MapHelpers.ICustomMapContext<")
+                .PopulateFullNamespace(item.Target!)
+                .Write(">.AutoMap(global::CommonBasicLibraries.AdvancedGeneralFunctionsAndProcesses.MapHelpers.IMappable payLoad)");
             })
             .WriteCodeBlock(w =>
             {
                 w.WriteLine(w =>
                 {
                     w.Write("if (payLoad is not ")
-                    .Write(item.Source!.GetGlobalName)
+                    .PopulateFullNamespace(item.Source!)
                     .Write(" item)");
                 })
                 .WriteCodeBlock(w =>
@@ -82,7 +82,7 @@ internal class EmitClass
                         w.CustomExceptionLine(w =>
                         {
                             w.Write("Invalid cast for ")
-                            .Write(item.Source!.ClassName);
+                            .Write(item.Source!.Name);
                         });
                     });
                 })
@@ -122,9 +122,9 @@ internal class EmitClass
                          w.WriteLine(w =>
                          {
                              w.Write("CommonBasicLibraries.AdvancedGeneralFunctionsAndProcesses.MapHelpers.CustomMapperHelpers<")
-                             .Write(item.Target!.GetGlobalName)
+                             .PopulateFullNamespace(item.Target!)
                              .Write(">.MasterContext = new ")
-                             .Write(item.Target!.ClassName)
+                             .Write(item.Target!.Name)
                              .Write("MapContext();");
                          });
                      }
@@ -184,7 +184,7 @@ internal class EmitClass
                 });
             }
         }, result);
-        _context.AddSource($"{result.Source!.ClassName}.MapExtensions.g", builder.ToString());
+        _context.AddSource($"{result.Source!.Name}.MapExtensions.g", builder.ToString());
     }
     private void ProcessMapToSafe(ICodeBlock w, MapModel result)
     {
@@ -196,7 +196,8 @@ internal class EmitClass
         }
         else
         {
-            CreateBasicOutput(w, result, result.Target!.GetGlobalName, EnumMethodCategory.Safe);
+            string globalName = $"global::{result.Target!.ContainingNamespace.ToDisplayString()}.{result.Target.Name}";
+            CreateBasicOutput(w, result, globalName, EnumMethodCategory.Safe);
         }
         PopulateLists(w, result, EnumMethodCategory.Safe);
         WritePostProcessing(w, result);
@@ -212,7 +213,8 @@ internal class EmitClass
         }
         else
         {
-            CreateBasicOutput(w, result, result.Target!.GetGlobalName, EnumMethodCategory.Regular);
+            string globalName = $"global::{result.Target!.ContainingNamespace.ToDisplayString()}.{result.Target.Name}";
+            CreateBasicOutput(w, result, globalName, EnumMethodCategory.Regular);
         }
         PopulateLists(w, result, EnumMethodCategory.Regular);
         WritePostProcessing(w, result);
@@ -279,9 +281,9 @@ internal class EmitClass
             w.WriteLine(w =>
             {
                 w.Write("Func<")
-                .Write(result.Source!.ClassName)
+                .Write(result.Source!.Name)
                 .Write(", ")
-                .Write(result.Target!.ClassName)
+                .Write(result.Target!.Name)
                 .Write("> instanceCreator = ")
                 .Write(lambda)
                 .Write(";");
@@ -374,6 +376,7 @@ internal class EmitClass
             });
         }
     }
+    //hopefully this does not cause other errors (?)
     private void CreateBasicOutput(ICodeBlock w, IProperties result, string globalName, EnumMethodCategory method)
     {
         void ConstructorProperties(ICodeBlock w)

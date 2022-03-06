@@ -91,19 +91,20 @@ internal class ParserClass
         foreach (var item in _tempMaps)
         {
             MapModel fins = new();
-            ClassModel info = new();
-            info.ClassName = item.Source!.Name;
-            info.NamespaceName = item.Source.ContainingNamespace.ToDisplayString();
-            fins.Source = info;
-            info = new();
-            info.ClassName = item.Target!.Name;
-            info.NamespaceName = item.Source.ContainingNamespace.ToDisplayString();
-            fins.Target = info;
+            //ClassModel info = new();
+            //info.ClassName = item.Source!.Name;
+            //info.NamespaceName = item.Source.ContainingNamespace.ToDisplayString();
+            fins.Source = item.Source;
+            fins.Target = item.Target;
+            //info = new();
+            //info.ClassName = item.Target!.Name;
+            //info.NamespaceName = item.Source.ContainingNamespace.ToDisplayString();
+            //fins.Target = info;
             fins.Error = item.Error;
             fins.PostProcess = item.PostProcess;
             fins.Activator = item.Activator;
             var pList = item.Source!.GetAllPublicProperties();
-            var seconds = item.Target.GetAllPublicProperties();
+            var seconds = item.Target!.GetAllPublicProperties();
             fins.IsMappable = item.IsMappable;
             fins.IsViewModelBase = item.IsViewModelBase;
             foreach (var p in pList)
