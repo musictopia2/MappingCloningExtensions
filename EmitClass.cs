@@ -88,7 +88,7 @@ internal class EmitClass
                 })
                 .WriteLine(w =>
                 {
-                    w.Write("return item. MapTo")
+                    w.Write("return item.MapTo")
                     .Write(item.Target!.Name)
                     .Write("();");
                 });
